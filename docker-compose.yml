@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  # PostgreSQL база данных
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ranobe_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      app_network:
+        aliases:
+          - dbhost
+        ipv4_address: 172.28.0.11
+
+  # pgAdmin для управления БД
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "8085:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      app_network:
+        ipv4_address: 172.28.0.12
+
+  # C# микросервис
+  microservice1:
+    build:
+      context: ./csapi
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=dbhost;Port=5432;Database=ranobe_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+    networks:
+      app_network:
+        ipv4_address: 172.28.0.13
+
+  # Python микросервис
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5000"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      app_network:
+        ipv4_address: 172.28.0.20
+
+volumes:
+  pgdata:
+  pgadmin-data:
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
