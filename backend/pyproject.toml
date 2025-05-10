@@ -1,0 +1,26 @@
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0.3"
+djangorestframework = "^3.14.0"
+dj-rest-auth = "^5.0.2"
+drf-yasg = "^1.21.7"
+django-cors-headers = "^4.3.1"
+pydantic = "^2.6.3"
+django-environ = "^0.11.2"
+django-allauth = "^0.61.1"
+drf-debug = "^1.2.1"
+django-filter = "^24.2"
+setuptools = "^70.0.0"
+pillow = "^10.4.0"
+psycopg2-binary = "^2.9.9"
+pandoc = "^2.4"
+markdown = "^3.7"
+lorem = "^0.1.1"
+
+[tool.poetry.group.test.dependencies]
+factory-boy = "^3.3.1"
+faker = "^28.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
